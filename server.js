@@ -1,5 +1,6 @@
 // Load all package
 const express = require('express');
+const cors = require('cors');
 const app = express();
 const config = require('./config');
 
@@ -7,6 +8,9 @@ const config = require('./config');
 const test = require('./router/test');
 
 // Setup all config
+app.use(cors({
+    origin: '*'
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

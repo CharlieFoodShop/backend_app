@@ -1,12 +1,12 @@
 // Load all packages
 const express = require('express');
-const { Client } = require('pg');
-const config = require('../config');
 
-// Create express router, connect to database
+// Load Models
+const FoodCategoryExample = require('./models/FoodCategoryExample');
+const FoodOptionExample = require('./models/FoodOptionExample');
+
+// Create express router
 const router = express.Router();
-const client = new Client(config.connection);
-client.connect();
 
 // / router for testing node is working
 router.get('/', (req, res) => {
@@ -15,11 +15,16 @@ router.get('/', (req, res) => {
 
 router.get('/test_database', async (req, res) => {
     try {
+        /*
         let sql = `SELECT *
                     FROM food_option_example`;
         const results = await client.query(sql);
 
         res.json({ data: results.rows });
+        */
+        const results = await FoodOptionExample.getAllFoodOptionExample();
+        res.json({ data: results });
+
     } catch (e) {
         res.json({ message: e.message });
     }

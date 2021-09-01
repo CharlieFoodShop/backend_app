@@ -3,10 +3,10 @@ const express = require('express');
 const validator = require('validator');
 const crypto = require('crypto');
 const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
 
 // Load shared functions
 const getTimestamp = require('./shared_function/getTimestamp');
+const sendMessage = require('./shared_function/sendMessage');
 
 // Load Models
 const Manager = require('./models/Manager');
@@ -133,22 +133,10 @@ router.post('/manager_password_reset', async (req, res) => {
         }
 
         // Sending email
-        let transporter = nodemailer.createTransport({
-            host: config.email_account.host,
-            port: config.email_account.port,
-            secure: true,
-            auth: {
-                user: config.email_account.user,
-                pass: config.email_account.pass
-            }
-        });
-        await transporter.sendMail({
-            from: config.email_account.user,
-            to: req.body.email_address,
-            subject: "Read this email to reset your password",
-            text: "Please follow the link below to reset your password. \n" +
-                config.url.manager_reset_password_url + token
-        });
+        let subject = "Read this email to reset your password";
+        let text = "Please follow the link below to reset your password. \n" +
+            config.url.manager_reset_password_url + token;
+        await sendMessage(req.body.email_address, subject, text);
 
         return res.status(201).json({ success: true, message: "Your email has been sent!" });
     } catch (e) {

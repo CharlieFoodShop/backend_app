@@ -6,5 +6,16 @@ module.exports = {
         password: '@Rzwqx5r8eu',
         port: 5432
     },
+    email_account: {
+        host: "smtp.mail.yahoo.com",
+        port: 465,
+        user: 'charlie_food_shop@yahoo.com',
+        pass: 'tqdtjqwiwdcvxmof'
+        // pass: 'XAZ82EeMgTGq88ZAxd'
+    },
+    url: {
+        base_url: 'http://144.34.175.242/',
+        manager_reset_password_url: 'http://144.34.175.242/manager/reset-password/'
+    },
     default_port: 7000
 };

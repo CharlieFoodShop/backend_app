@@ -7,9 +7,9 @@ const client = new Client(config.connection);
 client.connect();
 
 module.exports = {
-    getAllFoodOptionExample: async () => {
+    getAllFoodShopCategory: async () => {
         let sql = `SELECT *
-                    FROM food_option_example`;
+                    FROM food_shop_category`;
         const results = await client.query(sql);
         return results.rows;
     }

@@ -3,6 +3,7 @@ const express = require('express');
 
 // Load shared functions
 const getTimestamp = require('./shared_function/getTimestamp');
+const uploadImage = require('./shared_function/uploadImage');
 
 // Load Models
 const FoodShopCategory = require('./models/FoodShopCategory');
@@ -179,6 +180,16 @@ router.post('/update_food_category', async (req, res) => {
             Please check any information you give.` });
         }
     } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/upload_food_shop_image', async (req, res) => {
+    try {
+        await uploadImage(req, res, 4);
+        return;
+    } catch (e) {
+        console.log(e);
         return res.status(500).json({ success: false, message: e.message });
     }
 });

@@ -10,7 +10,6 @@ const FoodShopCategory = require('./models/FoodShopCategory');
 const FoodCategoryExample = require('./models/FoodCategoryExample');
 const FoodShop = require('./models/FoodShop');
 const FoodCategory = require('./models/FoodCategory');
-const await = require('await-stream-ready/lib/await');
 
 // Create express router, connect to database
 const router = express.Router();
@@ -185,34 +184,13 @@ router.post('/update_food_category', async (req, res) => {
     }
 });
 
-router.post('/update_food_image_url', async (req, res) => {
-    try {
-        if (!(
-            req.body.food_shop_id &&
-            req.body.image_url
-        ))
-            return res.status(400).json({ success: false, message: 'Please complete the detail' });
-
-        let result = await FoodShop.updateFoodShopImage(req.body.food_shop_id, req.body.image_url);
-        if (result) {
-            return res.status(201).json({ success: true, message: 'Update Food Image Url Successful!' });
-        } else {
-            return res.status(500).json({
-                success: false, message: `Sorry, fail to update food image url. 
-            Please check any information you give.` });
-        }
-    } catch (e) {
-        return res.status(500).json({ success: false, message: e.message });
-    }
-});
-
 router.post('/upload_food_shop_image', async (req, res) => {
     try {
         if (!req.query.id) {
             return res.status(400).json({ success: false, message: 'Please provide id' });
         }
 
-        await uploadImage(req, res, 4, req.query.id);
+        await uploadImage(req, res, 4, req.query.id, FoodShop.updateFoodShopImage);
         return;
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });

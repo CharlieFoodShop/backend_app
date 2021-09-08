@@ -8,7 +8,7 @@ const config = require('../../config');
 
 
 // Method to upload image
-module.exports = async (req, res, upload_type, id) => {
+module.exports = async (req, res, upload_type, id, database_function) => {
     /**
      * Upload Type
      * Customer Avatar - 1
@@ -60,6 +60,7 @@ module.exports = async (req, res, upload_type, id) => {
             await awaitWriteStream(stream.pipe(writeStream));
 
             let final_url = (path.join(config.url.api_url, target)).replace(/\\/g, '/');
+            await database_function(id, final_url);
             return res.status(201).json({ success: true, message: final_url });
         } catch (err) {
             await sendToWormhole(stream);

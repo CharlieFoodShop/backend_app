@@ -8,7 +8,7 @@ const config = require('../../config');
 
 
 // Method to upload image
-module.exports = async (req, res, upload_type) => {
+module.exports = async (req, res, upload_type, id) => {
     /**
      * Upload Type
      * Customer Avatar - 1
@@ -44,12 +44,23 @@ module.exports = async (req, res, upload_type) => {
             default:
                 return res.status(400).json({ success: false, message: 'Please give valid upload type' });
         }
-        const target = path.join('public/' + url, new_filename);
+
+
+        let file_dir = path.join('public/' + url, id);
+        if (fs.existsSync(file_dir)) {
+            fs.rmdirSync(file_dir, { recursive: true });
+        }
+        fs.mkdirSync(file_dir);
+
+
+        const target = path.join(file_dir, new_filename);
         const writeStream = fs.createWriteStream(target);
 
         try {
             await awaitWriteStream(stream.pipe(writeStream));
-            return res.status(201).json({ success: true, message: config.url.static_file + url + new_filename });
+
+            let final_url = (path.join(config.url.api_url, target)).replace(/\\/g, '/');
+            return res.status(201).json({ success: true, message: final_url });
         } catch (err) {
             await sendToWormhole(stream);
             throw err.message;

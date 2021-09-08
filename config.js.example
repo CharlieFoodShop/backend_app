@@ -15,7 +15,7 @@ module.exports = {
     },
     url: {
         base_url: 'http://144.34.175.242/',
-        static_file: 'http://144.34.175.242/api/public/',
+        api_url: 'http://144.34.175.242/api',
         manager_reset_password_url: 'http://144.34.175.242/manager/reset-password/'
     },
     default_port: 7000

@@ -35,5 +35,12 @@ module.exports = {
         const result = await client.query(sql, [food_shop_id, food_shop_category_id, food_shop_name, food_shop_description,
             image_url, working_address, lat, lon, open_time, close_time, active, updated_at]);
         return (result.rowCount === 1);
+    },
+    updateFoodShopImage: async (food_shop_id, image_url) => {
+        let sql = `UPDATE food_shop
+                    SET image_url = $1
+                    WHERE food_shop_id = $2`;
+        const result = await client.query(sql, [image_url, food_shop_id]);
+        return (result.rowCount === 1);
     }
 };

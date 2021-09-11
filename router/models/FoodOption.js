@@ -31,5 +31,14 @@ module.exports = {
                     WHERE food_option_id = $1`;
         const result = await client.query(sql, [food_option_id, food_option_name]);
         return (result.rowCount === 1);
+    },
+    deleteFoodOption: async (food_option_id) => {
+        let food_option_detail_sql = `DELETE FROM food_option_detail
+                                        WHERE food_option_id = $1`;
+        let food_option_sql = `DELETE FROM food_option
+                                WHERE food_option_id = $1`;
+        await client.query(food_option_detail_sql, [food_option_id]);
+        await client.query(food_option_sql, [food_option_id]);
+        return true;
     }
 };

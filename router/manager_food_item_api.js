@@ -3,6 +3,7 @@ const express = require('express');
 
 // Load shared functions
 const getTimestamp = require('./shared_function/getTimestamp');
+const uploadImage = require('./shared_function/uploadImage');
 
 // Load Models
 const FoodItem = require('./models/FoodItem');
@@ -116,12 +117,133 @@ router.post('/add_food_option_detail', async (req, res) => {
         let add_price = Math.round(req.body.add_price * 100);
         let result = await FoodOptionDetail.addFoodOptionDetail(req.body.food_option_id,
             req.body.food_option_detail_name, add_price);
+
         if (result.success) {
             return res.status(201).json({ success: true, message: 'Add food option detail successful!' });
         } else {
             return res.status(500).json({ success: false, message: 'Sorry, please try again' });
         }
 
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/update_food_item', async (req, res) => {
+    try {
+        if (!(req.body.food_item_id &&
+            req.body.food_category_id &&
+            req.body.food_name &&
+            req.body.food_price &&
+            req.body.food_description))
+            return res.status(400).json({ success: false, message: 'Please complete details' });
+
+        let image_url = null;
+        if (req.body.image_url) {
+            image_url = req.body.image_url;
+        }
+        let food_price = Math.round(req.body.food_price * 100);
+        let current_time = getTimestamp();
+
+        let result = await FoodItem.updateFoodItem(req.body.food_item_id, req.body.food_category_id,
+            req.body.food_name, food_price, req.body.food_description, image_url, current_time);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Update Food Item Successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to update food item. 
+            Please check any information you give.` });
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/update_food_option', async (req, res) => {
+    try {
+        if (!(req.body.food_option_id &&
+            req.body.food_option_name))
+            return res.status(400).json({ success: false, message: 'Please complete details' });
+
+        let result = await FoodOption.updateFoodOption(req.body.food_option_id, req.body.food_option_name);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Update Food Option Successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to update food option. 
+            Please check any information you give.` });
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/update_food_option_detail', async (req, res) => {
+    try {
+        if (!(req.body.food_option_detail_id &&
+            req.body.food_option_detail_name &&
+            req.body.add_price))
+            return res.status(400).json({ success: false, message: 'Please complete details' });
+        let add_price = Math.round(req.body.add_price * 100);
+
+        let result = await FoodOptionDetail.updateFoodOptionDetail(req.body.food_option_detail_id,
+            req.body.food_option_detail_name, add_price);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Update Food Option Detail Successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to update food option detail. 
+            Please check any information you give.` });
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/delete_food_option', async (req, res) => {
+    try {
+        if (!req.body.food_option_id)
+            return res.status(400).json({ success: false, message: 'Please provide detail.' });
+
+        let result = await FoodOption.deleteFoodOption(req.body.food_option_id);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Delete food option successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to delete food option,
+            please try again!`});
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/delete_food_option_detail', async (req, res) => {
+    try {
+        if (!req.body.food_option_detail_id)
+            return res.status(400).json({ success: false, message: 'Please provide detail.' });
+
+        let result = await FoodOptionDetail.deleteFoodOptionDetail(req.body.food_option_detail_id);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Delete option detail successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to delete option detail,
+            please try again!`});
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/upload_food_item_image', async (req, res) => {
+    try {
+        if (!req.query.id) {
+            return res.status(400).json({ success: false, message: 'Please provide id' });
+        }
+
+        await uploadImage(req, res, 3, req.query.id, FoodItem.updateFoodItemImage);
+        return;
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });
     }

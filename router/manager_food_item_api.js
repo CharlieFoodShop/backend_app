@@ -81,7 +81,7 @@ router.post('/add_food_item', async (req, res) => {
             current_time);
 
         if (result.success) {
-            return res.status(201).json({ success: true, message: 'Add food item successful!' });
+            return res.status(201).json({ success: true, message: 'Add food item successful!', food_item_id: result.food_item_id });
         } else {
             return res.status(500).json({ success: false, message: 'Sorry, please try again' });
         }
@@ -98,7 +98,7 @@ router.post('/add_food_option', async (req, res) => {
 
         let result = await FoodOption.addFoodOption(req.body.food_item_id, req.body.food_option_name);
         if (result.success) {
-            return res.status(201).json({ success: true, message: 'Add food option successful!' });
+            return res.status(201).json({ success: true, message: 'Add food option successful!', food_option_id: result.food_option_id });
         } else {
             return res.status(500).json({ success: false, message: 'Sorry, please try again' });
         }
@@ -119,7 +119,10 @@ router.post('/add_food_option_detail', async (req, res) => {
             req.body.food_option_detail_name, add_price);
 
         if (result.success) {
-            return res.status(201).json({ success: true, message: 'Add food option detail successful!' });
+            return res.status(201).json({
+                success: true, message: 'Add food option detail successful!',
+                food_option_detail_id: result.food_option_detail_id
+            });
         } else {
             return res.status(500).json({ success: false, message: 'Sorry, please try again' });
         }

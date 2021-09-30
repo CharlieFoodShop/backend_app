@@ -37,7 +37,7 @@ router.get('/get_all_food_option_by_item', async (req, res) => {
             return res.status(400).json({ success: false, message: 'Please provide item detail.' });
 
         let results = await FoodOption.getAllFoodOptionByItemId(req.query.food_item_id);
-        return res.status(200).json({ success: true, data: results })
+        return res.status(200).json({ success: true, data: results });
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });
     }

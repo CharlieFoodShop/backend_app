@@ -7,6 +7,7 @@ const bcrypt = require('bcrypt');
 // Load shared functions
 const getTimestamp = require('./shared_function/getTimestamp');
 const sendMessage = require('./shared_function/sendMessage');
+const authenticate_captcha = require('./shared_function/authenticate_captcha');
 
 // Load Models
 const Manager = require('./models/Manager');
@@ -16,7 +17,7 @@ const config = require('../config');
 // Create express router, connect to database
 const router = express.Router();
 
-router.post('/manager_register', async (req, res) => {
+router.post('/manager_register', authenticate_captcha, async (req, res) => {
     try {
 
         // Validate If input existed
@@ -77,7 +78,7 @@ router.post('/manager_register', async (req, res) => {
     }
 });
 
-router.post('/manager_login', async (req, res) => {
+router.post('/manager_login', authenticate_captcha, async (req, res) => {
     try {
         // Validate If input existed
         if (!(
@@ -94,7 +95,6 @@ router.post('/manager_login', async (req, res) => {
             !login_result.success ||
             !(await bcrypt.compare(req.body.password, login_result.existing_employee.password_hash)))
             return res.status(401).json({ success: false, message: "Fail to log in, please check your credentials!" });
-
         // Set session
         let sessionId = Date.now();
         req.session.cookie.sessionId = sessionId;
@@ -105,7 +105,15 @@ router.post('/manager_login', async (req, res) => {
     }
 });
 
-router.post('/manager_password_reset', async (req, res) => {
+router.post('/manager_logout', async (req, res) => {
+    try {
+        return res.status(201).json({ success: true, message: 'Logout Successful!' })
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/manager_password_reset', authenticate_captcha, async (req, res) => {
     try {
         // Check if email address is provided
         if (!req.body.email_address)
@@ -144,7 +152,7 @@ router.post('/manager_password_reset', async (req, res) => {
     }
 });
 
-router.post('/manager_password_reset/:token', async (req, res) => {
+router.post('/manager_password_reset/:token', authenticate_captcha, async (req, res) => {
     try {
 
         // Check if password is given
@@ -178,6 +186,23 @@ router.post('/manager_password_reset/:token', async (req, res) => {
             return res.status(201).json({ success: true, message: 'Reset password successful!' });
         } else {
             return res.status(500).json({ success: false, message: 'Sorry, fail to reset password. Please try again.' });
+        }
+
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/manager_detail', async (req, res) => {
+    try {
+        if (!req.query.email_address)
+            return res.status(400).json({ success: false, message: 'Please provide email address.' });
+
+        let results = await Manager.getManagerDetailByEmailAddress(req.query.email_address);
+        if (results.length === 0) {
+            return res.status(200).json({ success: false, message: 'Account is not exist.' });
+        } else {
+            return res.status(200).json({ success: true, data: results[0] });
         }
 
     } catch (e) {

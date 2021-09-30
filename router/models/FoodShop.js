@@ -12,12 +12,17 @@ module.exports = {
         lon, open_time, close_time, image_url) => {
 
         let sql = `INSERT INTO food_shop(manager_id, food_shop_category_id, food_shop_name, food_shop_description, created_at, working_address, lat, lon, open_time, close_time, image_url)
-                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`;
+                        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+                        RETURNING food_shop_id`;
         const result = await client.query(sql, [manager_id, food_shop_category_id,
             food_shop_name, food_shop_description,
             created_at, working_address, lat, lon,
             open_time, close_time, image_url]);
-        return (result.rowCount === 1);
+        if (result.rowCount === 1) {
+            return { success: true, food_shop_id: result.rows[0].food_shop_id };
+        } else {
+            return { success: false, food_shop_id: null };
+        }
     },
     getFoodShopByManagerId: async (manager_id) => {
         let sql = `SELECT *

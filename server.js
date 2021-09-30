@@ -14,7 +14,9 @@ const manager_order_api = require('./router/manager_order_api');
 
 // Setup all config
 app.use(cors({
-    origin: '*'
+    credentials: true,
+    origin: config.url.base_url
+    //origin: '*'
 }));
 app.use(session({
     secret: 'keyboard cat',

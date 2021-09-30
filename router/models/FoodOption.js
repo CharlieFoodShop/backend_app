@@ -13,9 +13,9 @@ module.exports = {
                     RETURNING food_option_id`;
         const result = await client.query(sql, [food_item_id, food_option_name]);
         if (result.rowCount === 1) {
-            return { success: true, food_option_id: result.rows[0].food_option_id }
+            return { success: true, food_option_id: result.rows[0].food_option_id };
         } else {
-            return { success: false, food_option_id: null }
+            return { success: false, food_option_id: null };
         }
     },
     getAllFoodOptionByItemId: async (food_item_id) => {

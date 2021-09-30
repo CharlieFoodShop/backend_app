@@ -30,5 +30,12 @@ module.exports = {
                     WHERE manager_id = $2`;
         const result = await client.query(sql, [password_hash, manager_id]);
         return (result.rowCount === 1);
+    },
+    getManagerDetailByEmailAddress: async (email_address) => {
+        let sql = `SELECT manager_id, first_name, last_name, email_address, phone, avatar_url, created_at, updated_at
+                    FROM manager
+                    WHERE email_address = $1`;
+        const result = await client.query(sql, [email_address]);
+        return result.rows;
     }
 };

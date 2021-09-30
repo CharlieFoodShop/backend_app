@@ -85,8 +85,8 @@ router.post('/add_food_shop', async (req, res) => {
             req.body.food_shop_description, current_timestamp, req.body.working_address, req.body.lat, req.body.lon,
             req.body.open_time, req.body.close_time, image_url);
 
-        if (result) {
-            return res.status(201).json({ success: true, message: 'Add Food Shop Successful!' });
+        if (result.success) {
+            return res.status(201).json({ success: true, message: 'Add Food Shop Successful!', food_shop_id: result.food_shop_id });
         } else {
             return res.status(500).json({
                 success: false, message: `Sorry, fail to add food shop. 

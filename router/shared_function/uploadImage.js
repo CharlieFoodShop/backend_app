@@ -60,6 +60,8 @@ module.exports = async (req, res, upload_type, id, database_function) => {
             await awaitWriteStream(stream.pipe(writeStream));
 
             let final_url = (path.join(config.url.api_url, target)).replace(/\\/g, '/');
+            final_url = "http:/" + final_url.slice(5, final_url.length);
+
             await database_function(id, final_url);
             return res.status(201).json({ success: true, message: final_url });
         } catch (err) {

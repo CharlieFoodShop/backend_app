@@ -27,6 +27,15 @@ module.exports = {
         const results = await client.query(sql, [food_category_id]);
         return results.rows;
     },
+    getFoodItemByFoodItemId: async (food_item_id) => {
+        let sql = `SELECT *
+                    FROM food_item
+                    JOIN food_category
+                    ON food_item.food_category_id = food_category.food_category_id
+                    WHERE food_item_id = $1`;
+        const results = await client.query(sql, [food_item_id]);
+        return results.rows[0];
+    },
     updateFoodItem: async (food_item_id, food_category_id, food_name, food_price, food_description, image_url, updated_at) => {
         let sql = `UPDATE food_item
                     SET food_category_id = $2, food_name = $3, food_price = $4, food_description = $5, image_url = $6, updated_at = $7

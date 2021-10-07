@@ -31,6 +31,15 @@ module.exports = {
         const results = await client.query(sql, [manager_id]);
         return results.rows;
     },
+    getFoodShopByFoodShopId: async (food_shop_id) => {
+        let sql = `SELECT *
+                    FROM food_shop
+                    JOIN food_shop_category
+                    ON food_shop.food_shop_category_id = food_shop_category.food_shop_category_id
+                    WHERE food_shop_id = $1`;
+        const results = await client.query(sql, [food_shop_id]);
+        return results.rows[0];
+    },
     updateFoodShop: async (food_shop_id, food_shop_category_id, food_shop_name, food_shop_description,
         image_url, working_address, lat, lon, open_time, close_time, active, updated_at) => {
         let sql = `UPDATE food_shop
@@ -39,6 +48,13 @@ module.exports = {
                     WHERE food_shop_id = $1`;
         const result = await client.query(sql, [food_shop_id, food_shop_category_id, food_shop_name, food_shop_description,
             image_url, working_address, lat, lon, open_time, close_time, active, updated_at]);
+        return (result.rowCount === 1);
+    },
+    updateFoodShopActivity: async (food_shop_id, active) => {
+        let sql = `UPDATE food_shop
+                    SET active = $1
+                    WHERE food_shop_id = $2`;
+        const result = await client.query(sql, [active, food_shop_id]);
         return (result.rowCount === 1);
     },
     updateFoodShopImage: async (food_shop_id, image_url) => {

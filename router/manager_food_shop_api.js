@@ -48,6 +48,19 @@ router.get('/get_food_shops_by_manager', async (req, res) => {
     }
 });
 
+router.get('/get_food_shops_by_food_shop', async (req, res) => {
+    try {
+        if (!req.query.food_shop_id) {
+            return res.status(400).json({ success: false, message: 'Please provide the detail of food shop' });
+        }
+
+        let results = await FoodShop.getFoodShopByFoodShopId(req.query.food_shop_id);
+        return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 router.get('/get_food_category_by_food_shop', async (req, res) => {
     try {
         if (!req.query.food_shop_id) {
@@ -176,6 +189,21 @@ router.post('/update_food_category', async (req, res) => {
         } else {
             return res.status(500).json({
                 success: false, message: `Sorry, fail to update food category. 
+            Please check any information you give.` });
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/update_food_shop_active', async (req, res) => {
+    try {
+        let result = await FoodShop.updateFoodShopActivity(req.body.food_shop_id, req.body.active);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Update Food Shop Active Successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to update food shop active. 
             Please check any information you give.` });
         }
     } catch (e) {

@@ -32,10 +32,37 @@ module.exports = {
         return (result.rowCount === 1);
     },
     getManagerDetailByEmailAddress: async (email_address) => {
-        let sql = `SELECT manager_id, first_name, last_name, email_address, phone, avatar_url, created_at, updated_at
+        let sql = `SELECT manager_id, first_name, last_name, email_address, phone, avatar_url, created_at, updated_at, client_id, client_secret_hash
                     FROM manager
                     WHERE email_address = $1`;
         const result = await client.query(sql, [email_address]);
         return result.rows;
+    },
+    updateManagerAccount: async (client_id, client_secret_hash, manager_id) => {
+        let sql = `UPDATE manager
+                    SET client_id = $1, client_secret_hash = $2
+                    WHERE manager_id = $3`;
+        const result = await client.query(sql, [client_id, client_secret_hash, manager_id]);
+        return (result.rowCount === 1);
+    },
+    updateManagerProfile: async (first_name, last_name, email_address, phone, password_hash, avatar_url, updated_at, manager_id) => {
+        let sql = `UPDATE manager
+                    SET first_name = $1, 
+                        last_name = $2, 
+                        email_address = $3, 
+                        phone = $4, 
+                        password_hash = $5, 
+                        avatar_url = $6, 
+                        updated_at = $7
+                    WHERE manager_id = $8`;
+        const result = await client.query(sql, [first_name, last_name, email_address, phone, password_hash, avatar_url, updated_at, manager_id]);
+        return (result.rowCount === 1);
+    },
+    UpdateManagerAvatar: async (manager_id, avatar_url) => {
+        let sql = `UPDATE manager
+                    SET avatar_url = $1
+                    WHERE manager_id = $2`;
+        const result = await client.query(sql, [avatar_url, manager_id]);
+        return (result.rowCount === 1);
     }
 };

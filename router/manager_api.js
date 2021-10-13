@@ -8,6 +8,8 @@ const bcrypt = require('bcrypt');
 const getTimestamp = require('./shared_function/getTimestamp');
 const sendMessage = require('./shared_function/sendMessage');
 const authenticate_captcha = require('./shared_function/authenticate_captcha');
+const uploadImage = require('./shared_function/uploadImage');
+const { encrypt, decrypt } = require('./shared_function/encrypt-decrypt');
 
 // Load Models
 const Manager = require('./models/Manager');
@@ -193,6 +195,119 @@ router.post('/manager_password_reset/:token', authenticate_captcha, async (req, 
     }
 });
 
+router.post('/manager_update_account', async (req, res) => {
+    try {
+        if (!(
+            req.body.client_id &&
+            req.body.client_secret &&
+            req.body.manager_id
+        ))
+            return res.status(400).json({ success: false, message: "Please complete account detail!" });
+
+        let client_secret_hash = encrypt(req.body.client_secret)
+        let result = await Manager.updateManagerAccount(req.body.client_id, client_secret_hash, req.body.manager_id);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Update Account Successful!' });
+        } else {
+            return res.status(500).json({
+                success: false, message: `Sorry, fail to update Account. 
+            Please check any information you give.` });
+        }
+
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/manager_update_profile', async (req, res) => {
+    try {
+        if (!(
+            req.body.first_name &&
+            req.body.last_name &&
+            req.body.old_email_address &&
+            req.body.new_email_address &&
+            req.body.old_phone &&
+            req.body.new_phone &&
+            req.body.password &&
+            req.body.manager_id
+        ))
+            return res.status(400).json({ success: false, message: "Pleases complete the required information!" });
+
+        if (!(validator.isEmail(req.body.new_email_address) && validator.isMobilePhone(req.body.new_phone, ['en-CA'])))
+            return res.status(400).json({ success: false, message: 'Invalid email address or phone number!' });
+
+        if (!validator.isStrongPassword(req.body.password, {
+            minLength: 8,
+            minLowercase: 1,
+            minUppercase: 1,
+            minNumbers: 1,
+            minSymbols: 1
+        }))
+            return res.status(400).json({
+                success: false,
+                message: `Invalid password, password should be at least 8 characters, with 1 Uppercase, 1 Lowercase, 1 Number and 1 Symbol.`
+            });
+
+        if (req.body.old_email_address !== req.body.new_email_address) {
+            let result_c1 = await Manager.checkManagerExisted(req.body.new_email_address, null);
+            if (result_c1.success)
+                return res.status(400).json({
+                    success: false, message: `Sorry, this email address or phone number has already be taken!`
+                });
+        }
+
+        if (req.body.old_phone !== req.body.new_phone) {
+            let result_c2 = await Manager.checkManagerExisted(null, req.body.new_phone);
+            if (result_c2.success)
+                return res.status(400).json({
+                    success: false, message: `Sorry, this email address or phone number has already be taken!`
+                });
+        }
+
+        const salt = await bcrypt.genSalt(10);
+        const password_hash = await bcrypt.hash(req.body.password, salt);
+
+        let avatar_url = null;
+        if (req.body.avatar_url) {
+            avatar_url = req.body.avatar_url;
+        }
+
+        let updated_at = getTimestamp();
+
+        let update_result = Manager.updateManagerProfile(
+            req.body.first_name,
+            req.body.last_name,
+            req.body.new_email_address,
+            req.body.new_phone,
+            password_hash,
+            avatar_url,
+            updated_at,
+            req.body.manager_id
+        );
+
+        if (update_result) {
+            return res.status(201).json({ success: true, message: 'Update Successful!' });
+        } else {
+            return res.status(500).json({ success: false, message: 'Sorry, fail to update. Please try again.' });
+        }
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/manager_upload_avatar', async (req, res) => {
+    try {
+        if (!req.query.id) {
+            return res.status(400).json({ success: false, message: 'Please provide id' });
+        }
+
+        await uploadImage(req, res, 5, req.query.id, Manager.UpdateManagerAvatar);
+        return;
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 router.get('/manager_detail', async (req, res) => {
     try {
         if (!req.query.email_address)
@@ -202,7 +317,14 @@ router.get('/manager_detail', async (req, res) => {
         if (results.length === 0) {
             return res.status(200).json({ success: false, message: 'Account is not exist.' });
         } else {
-            return res.status(200).json({ success: true, data: results[0] });
+            let data = results[0];
+            if (data.client_secret_hash) {
+                data.client_secret = decrypt(data.client_secret_hash);
+            } else {
+                data.client_secret = null;
+            }
+
+            return res.status(200).json({ success: true, data: data });
         }
 
     } catch (e) {

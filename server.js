@@ -12,6 +12,8 @@ const manager_food_shop_api = require('./router/manager_food_shop_api');
 const manager_food_item_api = require('./router/manager_food_item_api');
 const manager_order_api = require('./router/manager_order_api');
 
+const customer_api = require('./router/customer_api');
+
 // Setup all config
 app.use(cors({
     credentials: true,
@@ -37,6 +39,8 @@ app.use('/manager_api', manager_api);
 app.use('/manager_food_shop_api', manager_food_shop_api);
 app.use('/manager_food_item_api', manager_food_item_api);
 app.use('/manager_order_api', manager_order_api);
+
+app.use('/customer_api', customer_api);
 
 // Start server
 app.listen(config.default_port,

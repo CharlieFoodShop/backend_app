@@ -97,8 +97,8 @@ router.post('/customer_login', authenticate_captcha, async (req, res) => {
             !(await bcrypt.compare(req.body.password, login_result.existing_customer.password_hash)))
             return res.status(401).json({ success: false, message: "Fail to log in, please check your credentials!" });
         // Set session
-        let sessionId = Date.now();
-        req.session.cookie.sessionId = sessionId;
+        let customerSessionId = Date.now();
+        req.session.cookie.customerSessionId = customerSessionId;
         return res.status(201).json({ success: true, message: 'Log in successful!', customerSessionId: customerSessionId });
 
     } catch (e) {

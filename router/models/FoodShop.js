@@ -63,5 +63,21 @@ module.exports = {
                     WHERE food_shop_id = $2`;
         const result = await client.query(sql, [image_url, food_shop_id]);
         return (result.rowCount === 1);
+    },
+
+
+
+
+
+    customerRandomlyPopUp: async () => {
+        let sql = `SELECT food_shop_id, food_shop_name, image_url, working_address, food_shop_category_name
+                    FROM food_shop
+                    JOIN food_shop_category
+                    ON food_shop.food_shop_category_id = food_shop_category.food_shop_category_id
+                    WHERE active = true
+                    ORDER BY RANDOM()
+                    LIMIT 50`;
+        const results = await client.query(sql);
+        return results.rows;
     }
 };

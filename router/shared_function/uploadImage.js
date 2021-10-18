@@ -47,10 +47,11 @@ module.exports = async (req, res, upload_type, id, database_function) => {
 
 
         let file_dir = path.join('public/' + url, id);
-        if (fs.existsSync(file_dir)) {
-            fs.rmdirSync(file_dir, { recursive: true });
+        if (!fs.existsSync(file_dir)) {
+            // fs.rmdirSync(file_dir, { recursive: true });
+            fs.mkdirSync(file_dir);
         }
-        fs.mkdirSync(file_dir);
+
 
 
         const target = path.join(file_dir, new_filename);

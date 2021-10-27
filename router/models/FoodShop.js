@@ -79,5 +79,10 @@ module.exports = {
                     LIMIT 50`;
         const results = await client.query(sql);
         return results.rows;
+    },
+    getCustomerFavouriteFoodShops: async (email_address) => {
+        let sql = ``;
+        const results = await client.query(sql, [email_address]);
+        return results.rows;
     }
 };

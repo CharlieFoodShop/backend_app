@@ -5,6 +5,7 @@ const express = require('express');
 
 // Load Models
 const FoodShop = require('./models/FoodShop');
+const FoodCategory = require('./models/FoodCategory');
 const Customer = require('./models/Customer');
 const CustomerFavouriteFoodShop = require('./models/CustomerFavouriteFoodShop');
 
@@ -30,6 +31,60 @@ router.get('/get_random_food_shops', async (req, res) => {
             }
         }
 
+        return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/get_favourite_food_shops', async (req, res) => {
+    try {
+        if (!req.query.email_address)
+            return res.status(400).json({ success: false, message: "Pleases provide email address!" });
+
+        let results = await FoodShop.getCustomerFavouriteFoodShops(req.query.email_address);
+        for (let i = 0; i < results.length; i++) {
+            results[i].on_favourite = true;
+        }
+
+        return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/get_food_shop_detail', async (req, res) => {
+    try {
+        if (!(req.query.email_address &&
+            req.query.food_shop_id
+        ))
+            return res.status(400).json({ success: false, message: "Pleases provide email address and shop id!" });
+
+        let food_shop_detail = await FoodShop.getCustomerFoodShopDetail(req.query.food_shop_id);
+        let favourite_list = await CustomerFavouriteFoodShop.getFavouriteListByCustomerEmailAddress(req.query.email_address);
+
+        food_shop_detail.on_favourite = false;
+        for (let i = 0; i < favourite_list.length; i++) {
+            if (favourite_list[i].food_shop_id === food_shop_detail.food_shop_id) {
+                food_shop_detail.on_favourite = true;
+                break;
+            }
+        }
+
+        return res.status(200).json({ success: true, data: food_shop_detail });
+
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/get_food_category_by_food_shop_id', async (req, res) => {
+    try {
+        if (!req.query.food_shop_id) {
+            return res.status(400).json({ success: false, message: 'Please provide the detail of food shop' });
+        }
+
+        let results = await FoodCategory.getAllFoodCategoryByFoodShopId(req.query.food_shop_id);
         return res.status(200).json({ success: true, data: results });
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });

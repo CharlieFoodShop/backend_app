@@ -81,8 +81,26 @@ module.exports = {
         return results.rows;
     },
     getCustomerFavouriteFoodShops: async (email_address) => {
-        let sql = ``;
+        let sql = `SELECT food_shop.food_shop_id, food_shop_name, image_url, working_address, food_shop_category_name, active
+                    FROM food_shop
+                    JOIN food_shop_category
+                    ON food_shop.food_shop_category_id = food_shop_category.food_shop_category_id
+                    JOIN customer_favourite_food_shop
+                    ON customer_favourite_food_shop.food_shop_id = food_shop.food_shop_id
+                    JOIN customer
+                    ON customer_favourite_food_shop.customer_id = customer.customer_id
+                    WHERE customer.email_address = $1`;
         const results = await client.query(sql, [email_address]);
         return results.rows;
+    },
+    getCustomerFoodShopDetail: async (food_shop_id) => {
+        let sql = `SELECT food_shop_id, food_shop_category_name, food_shop_name, 
+                    food_shop_description, food_shop_rating, image_url, working_address, open_time, active
+                    FROM food_shop
+                    JOIN food_shop_category
+                    ON food_shop_category.food_shop_category_id = food_shop.food_shop_category_id
+                    WHERE food_shop_id = $1`;
+        const results = await client.query(sql, [food_shop_id]);
+        return results.rows[0];
     }
 };

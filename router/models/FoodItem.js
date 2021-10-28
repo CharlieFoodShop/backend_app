@@ -49,5 +49,34 @@ module.exports = {
                     WHERE food_item_id = $1`;
         const result = await client.query(sql, [food_item_id, image_url]);
         return (result.rowCount === 1);
+    },
+
+
+
+
+
+    getCustomerFoodItemByFoodShopId: async (food_shop_id) => {
+        let sql = `SELECT food_item_id, food_name, food_item.image_url, 
+                    food_average_rating, food_category_name, active, food_price
+                    FROM food_item
+                    JOIN food_category
+                    ON food_category.food_category_id = food_item.food_category_id
+                    JOIN food_shop
+                    ON food_shop.food_shop_id = food_category.food_shop_id
+                    WHERE food_shop.food_shop_id = $1`;
+        const results = await client.query(sql, [food_shop_id]);
+        return results.rows;
+    },
+    getCustomerFoodItemByCategoryId: async (food_category_id) => {
+        let sql = `SELECT food_item_id, food_name, food_item.image_url, 
+                    food_average_rating, food_category_name, active, food_price
+                    FROM food_item
+                    JOIN food_category
+                    ON food_category.food_category_id = food_item.food_category_id
+                    JOIN food_shop
+                    ON food_shop.food_shop_id = food_category.food_shop_id
+                    WHERE food_category.food_category_id = $1`;
+        const results = await client.query(sql, [food_category_id]);
+        return results.rows;
     }
 };

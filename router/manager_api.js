@@ -109,6 +109,7 @@ router.post('/manager_login', authenticate_captcha, async (req, res) => {
 
 router.post('/manager_logout', async (req, res) => {
     try {
+        delete req.session.cookie.sessionId;
         return res.status(201).json({ success: true, message: 'Logout Successful!' })
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });

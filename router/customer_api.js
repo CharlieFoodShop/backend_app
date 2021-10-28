@@ -108,6 +108,7 @@ router.post('/customer_login', authenticate_captcha, async (req, res) => {
 
 router.post('/customer_logout', async (req, res) => {
     try {
+        req.session.cookie.customerSessionId;
         return res.status(201).json({ success: true, message: 'Logout Successful!' })
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });

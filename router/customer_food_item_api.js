@@ -39,5 +39,19 @@ router.get('/get_food_items_by_category_id', async (req, res) => {
     }
 });
 
+router.get('/get_food_item_by_id', async (req, res) => {
+    try {
+        if (!req.query.food_item_id)
+            return res.status(400).json({ success: false, message: "Pleases provide item id!" });
+
+        let result = await FoodItem.getCustomerFoodItemDetailById(req.query.food_item_id);
+        result.food_price = result.food_price / 100;
+
+        return res.status(200).json({ success: true, data: result });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 // Export the router
 module.exports = router;

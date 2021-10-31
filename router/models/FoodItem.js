@@ -78,5 +78,17 @@ module.exports = {
                     WHERE food_category.food_category_id = $1`;
         const results = await client.query(sql, [food_category_id]);
         return results.rows;
+    },
+    getCustomerFoodItemDetailById: async (food_item_id) => {
+        let sql = `SELECT food_item_id, food_name, food_price, food_shop.food_shop_id,
+                    food_description, food_item.image_url, food_average_rating, food_category_name, active
+                    FROM food_item
+                    JOIN food_category
+                    ON food_item.food_category_id = food_category.food_category_id
+                    JOIN food_shop
+                    ON food_shop.food_shop_id = food_category.food_shop_id
+                    WHERE food_item_id = $1`;
+        const result = await client.query(sql, [food_item_id]);
+        return result.rows[0];
     }
 };

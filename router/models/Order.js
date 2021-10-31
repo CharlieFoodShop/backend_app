@@ -7,7 +7,7 @@ const client = new Client(config.connection);
 client.connect();
 
 module.exports = {
-    getOrderListByManager: (manager_id) => {
+    getOrderListByManager: async (manager_id) => {
         let sql = `SELECT (cu.first_name || cu.last_name) AS customer_name, o.created_at, o.order_id
             FROM "order" o
             JOIN customer cu
@@ -26,5 +26,22 @@ module.exports = {
             ORDER BY o.created_at DESC`;
         const results = await client.query(sql, [manager_id]);
         return results.rows;
+    },
+
+
+
+
+    getClientKeys: async (food_item_id) => {
+        let sql = `SELECT client_id, client_secret_hash
+                    FROM food_item
+                    JOIN food_category
+                    ON food_item.food_category_id = food_category.food_category_id
+                    JOIN food_shop
+                    ON food_shop.food_shop_id = food_category.food_shop_id
+                    JOIN manager
+                    ON food_shop.manager_id = manager.manager_id
+                    WHERE food_item_id = $1`;
+        const result = await client.query(sql, [food_item_id]);
+        return result.rows[0];
     }
 };

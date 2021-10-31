@@ -13,6 +13,13 @@ module.exports = {
         const results = await client.query(sql);
         return results.rows;
     },
+    getDeliverDriverById: async (deliver_driver_id) => {
+        let sql = `SELECT *
+                    FROM deliver_driver
+                    WHERE deliver_driver_id = $1`;
+        const result = await client.query(sql, [deliver_driver_id]);
+        return result.rows[0];
+    },
     UpdateDriverAvatar: async (deliver_driver_id, avatar_url) => {
         let sql = `UPDATE deliver_driver
                     SET avatar_url = $1

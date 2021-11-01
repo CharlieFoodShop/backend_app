@@ -67,6 +67,7 @@ router.post('/create_order', async (req, res) => {
             return res.status(500).json({ success: false, message: 'Fail to create order' });
         }
     } catch (e) {
+        console.log(e);
         return res.status(500).json({ success: false, message: e.message });
     }
 });
@@ -114,6 +115,7 @@ router.post('/add_order_to_database', async (req, res) => {
         return res.status(201).json({ success: true, message: 'Add to database successful' });
 
     } catch (e) {
+        console.log(e);
         return res.status(500).json({ success: false, message: e.message });
     }
 })

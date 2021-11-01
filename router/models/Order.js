@@ -43,5 +43,28 @@ module.exports = {
                     WHERE food_item_id = $1`;
         const result = await client.query(sql, [food_item_id]);
         return result.rows[0];
+    },
+    insertNewOrder: async (deliver_driver_id, customer_id, note, total, created_at, address, lat, lon) => {
+        let sql = `INSERT INTO "order" (deliver_driver_id, customer_id, note, total, created_at, address, lat, lon)
+                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+                    RETURNING order_id`;
+        const result = await client.query(sql, [deliver_driver_id, customer_id, note, total, created_at, address, lat, lon]);
+        if (result.rowCount === 1) {
+            return { success: true, order_id: result.rows[0].order_id };
+        } else {
+            return { success: false, order_id: null };
+        }
+    },
+    insertNewOrderItem: async (order_id, food_item_id, quantity, sub_total) => {
+        let sql = `INSERT INTO order_item(order_id, food_item_id, options, quantity, sub_total)
+                    VALUES ($1, $2, null, $3, $4)`;
+        const result = await client.query(sql, [order_id, food_item_id, quantity, sub_total]);
+        return result.rowCount === 1;
+    },
+    insertNewOrderStatus: async (order_id, order_status_name) => {
+        let sql = `INSERT INTO order_status(order_id, order_status_name)
+                    VALUES ($1, $2)`;
+        const result = await client.query(sql, [order_id, order_status_name]);
+        return result.rowCount === 1;
     }
 };

@@ -33,6 +33,7 @@ router.post('/create_order', async (req, res) => {
         for (let i = 0; i < item_list.length; i++) {
             total += (item_list[i].food_price * item_list[i].quantity)
         }
+        total = Math.round(total * 100) / 100;
 
 
         let client_key = await Order.getClientKeys(req.body.item_list[0].food_item_id);

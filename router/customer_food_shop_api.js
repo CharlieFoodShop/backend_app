@@ -91,6 +91,34 @@ router.get('/get_food_category_by_food_shop_id', async (req, res) => {
     }
 });
 
+router.get('/get_search_results', async (req, res) => {
+    try {
+        if (!(
+            req.query.text &&
+            req.query.email_address
+        )) {
+            return res.status(400).json({ success: false, message: 'Please provide the text for search, and user detail' });
+        }
+
+        let results = await FoodShop.getSearchedFoodShops(req.query.text);
+        let favourite_list = await CustomerFavouriteFoodShop.getFavouriteListByCustomerEmailAddress(req.query.email_address);
+
+        for (let i = 0; i < results.length; i++) {
+            results[i].on_favourite = false;
+            for (let j = 0; j < favourite_list.length; j++) {
+                if (results[i].food_shop_id === favourite_list[j].food_shop_id) {
+                    results[i].on_favourite = true;
+                    break;
+                }
+            }
+        }
+
+        return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 router.post('/update_favourite_food_shop', async (req, res) => {
     try {
         if (!(

@@ -44,11 +44,11 @@ module.exports = {
         const result = await client.query(sql, [food_item_id]);
         return result.rows[0];
     },
-    insertNewOrder: async (deliver_driver_id, customer_id, note, total, created_at, address, lat, lon) => {
-        let sql = `INSERT INTO "order" (deliver_driver_id, customer_id, note, total, created_at, address, lat, lon)
-                    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    insertNewOrder: async (customer_id, note, total, created_at, hst) => {
+        let sql = `INSERT INTO "order" (customer_id, note, total, created_at, hst)
+                    VALUES ($1, $2, $3, $4, $5)
                     RETURNING order_id`;
-        const result = await client.query(sql, [deliver_driver_id, customer_id, note, total, created_at, address, lat, lon]);
+        const result = await client.query(sql, [customer_id, note, total, created_at, hst]);
         if (result.rowCount === 1) {
             return { success: true, order_id: result.rows[0].order_id };
         } else {

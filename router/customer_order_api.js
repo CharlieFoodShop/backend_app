@@ -8,7 +8,6 @@ const { decrypt } = require('./shared_function/encrypt-decrypt');
 
 // Load Models
 const Order = require('./models/Order');
-const DeliverDriver = require('./models/DeliverDriver');
 const Customer = require('./models/Customer');
 
 // Create express router, connect to database
@@ -19,16 +18,12 @@ router.post('/create_order', async (req, res) => {
         if (!(
             req.body.email_address,
             req.body.item_list,
-            req.body.address,
-            req.body.driver_id,
-            req.body.lat,
-            req.body.lon
+            req.body.hst
         ))
             return res.status(400).json({ success: false, message: "Pleases provide all the information!" });
 
         let item_list = [...req.body.item_list];
-        let driver_detail = await DeliverDriver.getDeliverDriverById(req.body.driver_id);
-        let total = driver_detail.cost / 100;
+        let total = req.body.hst;
 
         for (let i = 0; i < item_list.length; i++) {
             total += (item_list[i].food_price * item_list[i].quantity)
@@ -78,16 +73,12 @@ router.post('/add_order_to_database', async (req, res) => {
         if (!(
             req.body.email_address,
             req.body.item_list,
-            req.body.address,
-            req.body.driver_id,
-            req.body.lat,
-            req.body.lon
+            req.body.hst
         ))
             return res.status(400).json({ success: false, message: "Pleases provide all the information!" });
 
         let item_list = [...req.body.item_list];
-        let driver_detail = await DeliverDriver.getDeliverDriverById(req.body.driver_id);
-        let total = driver_detail.cost / 100;
+        let total = 0;
 
         for (let i = 0; i < item_list.length; i++) {
             total += (item_list[i].food_price * item_list[i].quantity)
@@ -96,14 +87,12 @@ router.post('/add_order_to_database', async (req, res) => {
         let customer_id = (await Customer.getCustomerDetailByEmailAddress(req.body.email_address))[0].customer_id;
 
         let order_id = (await Order.insertNewOrder(
-            req.body.driver_id,
             customer_id,
             req.body.note,
             Math.floor(total * 100),
             getTimestamp(),
-            req.body.address,
-            req.body.lat,
-            req.body.lon)).order_id;
+            Math.floor(req.body.hst * 100))).order_id;
+
         for (let i = 0; i < item_list.length; i++) {
             await Order.insertNewOrderItem(
                 order_id,

@@ -205,7 +205,10 @@ router.post('/customer_update_profile', async (req, res) => {
             req.body.old_phone &&
             req.body.new_phone &&
             req.body.password &&
-            req.body.customer_id
+            req.body.customer_id &&
+            req.body.address &&
+            req.body.lat &&
+            req.body.lon
         ))
             return res.status(400).json({ success: false, message: "Pleases complete the required information!" });
 
@@ -258,6 +261,9 @@ router.post('/customer_update_profile', async (req, res) => {
             req.body.new_phone,
             avatar_url,
             updated_at,
+            req.body.address,
+            req.body.lat,
+            req.body.lon,
             req.body.customer_id
         );
 

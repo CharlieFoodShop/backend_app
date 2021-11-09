@@ -32,13 +32,13 @@ module.exports = {
         return (result.rowCount === 1);
     },
     getCustomerDetailByEmailAddress: async (email_address) => {
-        let sql = `SELECT customer_id, first_name, last_name, email_address, phone, avatar_url, created_at, updated_at
+        let sql = `SELECT customer_id, first_name, last_name, email_address, phone, avatar_url, address, lat, lon, created_at, updated_at
                     FROM customer
                     WHERE email_address = $1`;
         const result = await client.query(sql, [email_address]);
         return result.rows;
     },
-    updateCustomerProfile: async (first_name, last_name, password_hash, email_address, phone, avatar_url, updated_at, customer_id) => {
+    updateCustomerProfile: async (first_name, last_name, password_hash, email_address, phone, avatar_url, updated_at, address, lat, lon, customer_id) => {
         let sql = `UPDATE customer
                     SET first_name = $1, 
                         last_name = $2, 
@@ -46,9 +46,12 @@ module.exports = {
                         email_address = $4, 
                         phone = $5, 
                         avatar_url = $6, 
-                        updated_at = $7
-                    WHERE customer_id = $8`;
-        const result = await client.query(sql, [first_name, last_name, password_hash, email_address, phone, avatar_url, updated_at, customer_id]);
+                        updated_at = $7,
+                        address = $8,
+                        lat = $9,
+                        lon = $10
+                    WHERE customer_id = $11`;
+        const result = await client.query(sql, [first_name, last_name, password_hash, email_address, phone, avatar_url, updated_at, address, lat, lon, customer_id]);
         return (result.rowCount === 1);
     },
     UpdateCustomerAvatar: async (customer_id, avatar_url) => {

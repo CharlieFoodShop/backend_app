@@ -102,5 +102,14 @@ module.exports = {
                     WHERE food_shop_id = $1`;
         const results = await client.query(sql, [food_shop_id]);
         return results.rows[0];
+    },
+    getSearchedFoodShops: async (text) => {
+        let sql = `SELECT food_shop.food_shop_id, food_shop_name, image_url, working_address, food_shop_category_name, active
+                    FROM food_shop
+                    JOIN food_shop_category
+                    ON food_shop_category.food_shop_category_id = food_shop.food_shop_category_id
+                    WHERE UPPER(food_shop_name) LIKE concat('%', UPPER($1), '%') OR UPPER(food_shop_category_name) LIKE concat('%', UPPER($2), '%')`;
+        const results = await client.query(sql, [text, text]);
+        return results.rows;
     }
 };

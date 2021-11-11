@@ -44,6 +44,39 @@ module.exports = {
         const result = await client.query(sql, [food_item_id]);
         return result.rows[0];
     },
+    getCurrentOrders: async (email_address) => {
+        let sql = `SELECT "order".order_id, "order".created_at, order_status_name
+                    FROM "order"
+                    JOIN customer
+                    ON "order".customer_id = customer.customer_id
+                    JOIN order_status
+                    ON "order".order_id = order_status.order_id
+                    WHERE order_status.order_status_name = 'PREPARING' AND email_address = $1
+                    ORDER BY "order".created_at DESC`;
+        const results = await client.query(sql, [email_address]);
+        return results.rows;
+    },
+    getOrderHistory: async (email_address) => {
+        let sql = `SELECT "order".order_id, "order".created_at, order_status_name
+                    FROM "order"
+                    JOIN customer
+                    ON "order".customer_id = customer.customer_id
+                    JOIN order_status
+                    ON "order".order_id = order_status.order_id
+                    WHERE email_address = $1
+                    ORDER BY "order".created_at DESC`;
+        const results = await client.query(sql, [email_address]);
+        return results.rows;
+    },
+    getCustomerOrderDetailByOrderId: async (order_id) => {
+        let sql = `SELECT "order".order_id, note, total, created_at, completed_at, hst, order_status_name
+                    FROM "order"
+                    JOIN order_status
+                    ON "order".order_id = order_status.order_id
+                    WHERE "order".order_id = $1`;
+        const results = await client.query(sql, [order_id]);
+        return results.rows[0];
+    },
     insertNewOrder: async (customer_id, note, total, created_at, hst) => {
         let sql = `INSERT INTO "order" (customer_id, note, total, created_at, hst)
                     VALUES ($1, $2, $3, $4, $5)

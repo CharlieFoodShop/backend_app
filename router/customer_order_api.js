@@ -8,10 +8,59 @@ const { decrypt } = require('./shared_function/encrypt-decrypt');
 
 // Load Models
 const Order = require('./models/Order');
+const OrderItem = require('./models/OrderItem');
 const Customer = require('./models/Customer');
 
 // Create express router, connect to database
 const router = express.Router();
+
+router.get('/get_current_orders', async (req, res) => {
+    try {
+        if (!req.query.email_address)
+            return res.status(400).json({ success: false, message: "Pleases provide user detail!" });
+
+        let results = await Order.getCurrentOrders(req.query.email_address);
+        return res.status(200).json({ success: true, data: results });
+
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/get_order_history', async (req, res) => {
+    try {
+        if (!req.query.email_address)
+            return res.status(400).json({ success: false, message: "Pleases provide user detail!" });
+
+        let results = await Order.getOrderHistory(req.query.email_address);
+        return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.get('/get_order_detail_by_order_id', async (req, res) => {
+    try {
+        if (!req.query.order_id)
+            return res.status(400).json({ success: false, message: "Pleases provide order detail!" });
+
+        let order_detail = await Order.getCustomerOrderDetailByOrderId(req.query.order_id);
+        order_detail.total = order_detail.total / 100;
+        order_detail.hst = order_detail.hst / 100;
+
+        let order_items = await OrderItem.getCustomerOrderItemList(req.query.order_id);
+        for (let i = 0; i < order_items.length; i++) {
+            order_items[i].sub_total = order_items[i].sub_total / 100;
+            order_items[i].food_price = order_items[i].food_price / 100;
+        }
+        order_detail.order_items = order_items;
+
+        return res.status(200).json({ success: true, data: order_detail });
+
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
 
 router.post('/create_order', async (req, res) => {
     try {
@@ -63,7 +112,6 @@ router.post('/create_order', async (req, res) => {
             return res.status(500).json({ success: false, message: 'Fail to create order' });
         }
     } catch (e) {
-        console.log(e);
         return res.status(500).json({ success: false, message: e.message });
     }
 });

@@ -94,13 +94,17 @@ router.post('/add_new_comment', async (req, res) => {
 router.post('/edit_comment', async (req, res) => {
     try {
         if (!(
-            req.body.comment &&
             req.body.rating &&
             req.body.food_comment_id
         ))
             return res.status(400).json({ success: false, message: "Pleases provide all the information!" });
 
-        let result = await FoodComment.editFoodComment(req.body.comment, req.body.rating, req.body.food_comment_id);
+        let comment = "";
+        if (req.body.comment) {
+            comment = req.body.comment;
+        }
+
+        let result = await FoodComment.editFoodComment(comment, req.body.rating, req.body.food_comment_id);
         if (result) {
             return res.status(201).json({ success: true, message: 'Edit comment successful!' });
         } else {

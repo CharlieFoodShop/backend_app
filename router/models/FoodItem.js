@@ -50,6 +50,22 @@ module.exports = {
         const result = await client.query(sql, [food_item_id, image_url]);
         return (result.rowCount === 1);
     },
+    deleteFoodItemById: async (food_item_id) => {
+        let deleteCommentSql = `DELETE FROM food_comment
+                                WHERE food_item_id = $1`;
+
+        let deleteOrderItemSql = `DELETE FROM order_item
+                                WHERE food_item_id = $1`;
+
+        let deleteFoodItemSql = `DELETE FROM food_item
+                                WHERE food_item_id = $1`;
+
+        await client.query(deleteCommentSql, [food_item_id]);
+        await client.query(deleteOrderItemSql, [food_item_id]);
+        await client.query(deleteFoodItemSql, [food_item_id]);
+
+        return true;
+    },
 
 
 

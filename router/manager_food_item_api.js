@@ -253,6 +253,18 @@ router.post('/delete_food_option_detail', async (req, res) => {
     }
 });
 
+router.post('/delete_food_item', async (req, res) => {
+    try {
+        if (!req.body.food_item_id)
+            return res.status(400).json({ success: false, message: 'Please provide item id!' });
+
+        await FoodItem.deleteFoodItemById(req.body.food_item_id);
+        return res.status(201).json({ success: true, message: 'Delete food item successful!' });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 router.post('/upload_food_item_image', async (req, res) => {
     try {
         if (!req.query.id) {

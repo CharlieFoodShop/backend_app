@@ -79,6 +79,19 @@ module.exports = {
         const results = await client.query(sql, [food_category_id]);
         return results.rows;
     },
+    getCustomerFoodItemBySearchText: async (food_shop_id, search_text) => {
+        let sql = `SELECT food_item_id, food_name, food_item.image_url, 
+                    food_average_rating, food_category_name, active, food_price
+                    FROM food_item
+                    JOIN food_category
+                    ON food_category.food_category_id = food_item.food_category_id
+                    JOIN food_shop
+                    ON food_shop.food_shop_id = food_category.food_shop_id
+                    WHERE food_shop.food_shop_id = $1 AND 
+                    ( UPPER(food_name) LIKE concat('%', UPPER($2), '%') OR UPPER(food_category_name) LIKE concat('%', UPPER($3), '%')  )`;
+        const results = await client.query(sql, [food_shop_id, search_text, search_text]);
+        return results.rows;
+    },
     getCustomerFoodItemDetailById: async (food_item_id) => {
         let sql = `SELECT food_item_id, food_name, food_price, food_shop.food_shop_id,
                     food_description, food_item.image_url, food_average_rating, food_category_name, active

@@ -1,3 +1,9 @@
+/*
+    I, ZiWei Rao (Charlie), 000795435, 
+    certify that this work is my own effort and that 
+    I have not allowed anyone else to copy from it.
+*/
+
 // Load all package
 const express = require('express');
 const cors = require('cors');
@@ -21,6 +27,7 @@ const customer_comment_api = require('./router/customer_comment_api');
 
 const deliver_driver_api = require('./router/deliver_driver_api');
 const customer_help_api = require('./router/customer_help_api');
+const manager_report_api = require('./router/manager_report_api');
 
 // Setup all config
 app.use(cors({
@@ -57,6 +64,7 @@ app.use('/customer_comment_api', customer_comment_api);
 
 app.use('/deliver_driver_api', deliver_driver_api);
 app.use('/customer_help_api', customer_help_api);
+app.use('/manager_report_api', manager_report_api);
 
 // Start server
 app.listen(config.default_port,

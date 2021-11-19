@@ -39,6 +39,21 @@ router.get('/get_food_items_by_category_id', async (req, res) => {
     }
 });
 
+router.get('/get_food_items_by_search_text', async (req, res) => {
+    try {
+        if (!(
+            req.query.food_shop_id &&
+            req.query.search_text
+        ))
+            return res.status(400).json({ success: false, message: "Pleases provide shop id and search text!" });
+
+        let results = await FoodItem.getCustomerFoodItemBySearchText(req.query.food_shop_id, req.query.search_text);
+        return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
 router.get('/get_food_item_by_id', async (req, res) => {
     try {
         if (!req.query.food_item_id)

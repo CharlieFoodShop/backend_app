@@ -6,6 +6,7 @@ const express = require('express');
 // Load Models
 const FoodShop = require('./models/FoodShop');
 const FoodCategory = require('./models/FoodCategory');
+const FoodShopRating = require('./models/FoodShopRating');
 const Customer = require('./models/Customer');
 const CustomerFavouriteFoodShop = require('./models/CustomerFavouriteFoodShop');
 
@@ -114,6 +115,25 @@ router.get('/get_search_results', async (req, res) => {
         }
 
         return res.status(200).json({ success: true, data: results });
+    } catch (e) {
+        return res.status(500).json({ success: false, message: e.message });
+    }
+});
+
+router.post('/add_rating_for_food_shop', async (req, res) => {
+    try {
+        if (!(
+            req.body.food_shop_id &&
+            req.body.rating
+        ))
+            return res.status(400).json({ success: false, message: "Pleases complete necessary information!" });
+
+        let result = await FoodShopRating.addRatingForFoodShop(req.body.food_shop_id, req.body.rating);
+        if (result) {
+            return res.status(201).json({ success: true, message: 'Thanks for your feedback!' });
+        } else {
+            return res.status(500).json({ success: false, message: 'Action fail, please try again!' });
+        }
     } catch (e) {
         return res.status(500).json({ success: false, message: e.message });
     }

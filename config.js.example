@@ -22,13 +22,13 @@ module.exports = {
         paypal_iv: 'ebb7e884fbad465ef54dd2611782e34d'
     },
 
-
     url: {
-        base_url: 'http://144.34.175.242',
-        api_url: 'http://144.34.175.242/api',
-        manager_reset_password_url: 'http://144.34.175.242/manager/reset-password/',
-        customer_reset_password_url: 'http://144.34.175.242/customer/reset-password/'
+        base_url: 'http://charliesfoodshop.com',
+        api_url: 'http://charliesfoodshop.com/api',
+        manager_reset_password_url: 'http://charliesfoodshop.com/manager/reset-password/',
+        customer_reset_password_url: 'http://charliesfoodshop.com/customer/reset-password/'
     },
+
     /*
     url: {
         base_url: 'http://localhost:3000',
@@ -37,5 +37,6 @@ module.exports = {
         customer_reset_password_url: 'http://localhost:3000/customer/reset-password/'
     },
     */
+
     default_port: 7000
 };
